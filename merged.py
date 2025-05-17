@@ -47,7 +47,7 @@ def rgb_to_color_name(rgb, dominance):
     hue, sat, val = hsv
 
     # First check for black/white/gray
-    if val < 30:
+    if val < 40:
         return 'black'
     elif sat < 30 and val > 200:
         return 'white'
@@ -104,7 +104,7 @@ def process_ocr(car_crop):
     largest_bbox = None
     
     for (bbox, text, prob) in results:
-        if prob > 0.4:  # Only consider detections with >40% confidence
+        if prob > 0.3:  # Only consider detections with >40% confidence
             # Calculate area of the bounding box
             (top_left, top_right, bottom_right, bottom_left) = bbox
             width = top_right[0] - top_left[0]
@@ -126,7 +126,7 @@ def process_ocr(car_crop):
     
     return largest_text
 
-def process_image(img_path, conf_threshold=0.2):
+def process_image(img_path, conf_threshold=0.1):
     """Main processing pipeline (works with BGR image)"""
     try:
         img = load_image(img_path)  # BGR image
@@ -206,7 +206,7 @@ def display_results(main_img, car_crops, car_info):
 # Main execution
 if __name__ == "__main__":
     # Change to your image path
-    image_path = '20200226-GTI-02.webp'
+    image_path = 'qvfr8eyzcvz31.jpg'
 
     # Process and display
     result_img, car_crops, car_info = process_image(image_path)  # Returns BGR image, crops, and info
@@ -217,9 +217,13 @@ if __name__ == "__main__":
 
         # Save results
         try:
+            
             cv2.imwrite('detected_cars.jpg', result_img)
+            '''
             for i, crop in enumerate(car_crops, 1):
-                cv2.imwrite(f'car_{i}.jpg', crop)
+                cv2.imwrite(f'car_{i}.jpg', crop)'''
+            
+            
             print("\nResults saved:")
             print("- Main image: 'detected_cars.jpg'")
             print(f"- Individual cars: {len(car_crops)} files (car_1.jpg, etc.)")
