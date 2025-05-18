@@ -1,4 +1,3 @@
-
 import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -8,6 +7,10 @@ import cv2
 import numpy as np
 from typing import List, Tuple, Dict
 import threading
+from allDataCopy import start
+
+
+start("20200226-GTI-02.webp")
 
 
 # ctk.set_appearance_mode("System")  
@@ -289,16 +292,12 @@ class CarAnalysisApp(ctk.CTk):
         car_color = self.car_colors[self.current_car_index]
         plate_text = self.plate_texts[self.current_car_index]
         
-        
         car_pil_img = Image.fromarray(cv2.cvtColor(car_img, cv2.COLOR_BGR2RGB))
-        
         
         self.display_image_on_canvas(car_pil_img, self.car_image_canvas)
         
-        
         self.car_color_label.configure(text=f"Color: {car_color}")
         self.plate_text_label.configure(text=f"License Plate: {plate_text}")
-        
         
         self.car_counter_label.configure(text=f"{self.current_car_index + 1}/{len(self.detected_cars)}")
     

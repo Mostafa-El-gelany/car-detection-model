@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import cv2
 import torch
 import numpy as np
@@ -7,7 +6,7 @@ import easyocr
 
 # Initialize EasyOCR reader
 reader = easyocr.Reader(['en'])  # Initialize with English language
-
+ 
 # Load pretrained YOLOv5 model
 model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
@@ -241,7 +240,7 @@ if __name__ == "__main__":
             print(f"Error saving results: {e}")
     else:
         print("No cars detected or error occurred.")
-=======
+
 import cv2
 import torch
 import numpy as np
@@ -484,4 +483,20 @@ if __name__ == "__main__":
             print(f"Error saving results: {e}")
     else:
         print("No cars detected or error occurred.")
->>>>>>> b9f0e1c1269b7905337f2d735a95f1768354f608
+
+
+def Gui_load_iamge(path):
+    load_image(path)
+    
+    
+def Gui_get_dominant_color(crop, k=3):
+    get_dominant_color(crop, k=3)
+    
+def Gui_get_array_of_color():
+    pass
+
+def Gui_get_array_of_cars():
+    pass
+
+def test():
+    return "test code here -------------"
