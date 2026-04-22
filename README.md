@@ -77,3 +77,5 @@ python app.py
 ## Example Images
 
 Sample images are available in the `images/` folder for quick testing.
+
+![alt text](<Screenshot 2026-04-22 221436.png>)

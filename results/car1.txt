@@ -1,0 +1,7 @@
+Car Detection Results - 1 cars found
+Source Image: D:/FCI/computer vision/car-detection-model/images/Screenshot 2026-04-22 221003.png
+
+Car 1:
+  Color: blue
+  License Plate: BBg BPS
+
