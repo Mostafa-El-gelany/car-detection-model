@@ -4,13 +4,8 @@ from tkinter import filedialog, messagebox
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import cv2
-import numpy as np
-from typing import List, Tuple, Dict
 import threading
-from allDataCopy import start
-
-
-start("20200226-GTI-02.webp")
+from src.allDataCopy import process_image as backend_process_image
 
 
 # ctk.set_appearance_mode("System")  
@@ -154,7 +149,7 @@ class CarAnalysisApp(ctk.CTk):
     def browse_image(self):
         """Open file dialog to select an image"""
         filetypes = (
-            ("Image files", "*.jpg *.jpeg *.png *.bmp"),
+            ("Image files", "*.jpg *.jpeg *.png *.bmp *.webp"),
             ("All files", "*.*")
         )
         
@@ -186,6 +181,7 @@ class CarAnalysisApp(ctk.CTk):
         if image is None:
             return
             
+        canvas.update_idletasks()
         
         canvas_width = canvas.winfo_width()
         canvas_height = canvas.winfo_height()
@@ -217,7 +213,7 @@ class CarAnalysisApp(ctk.CTk):
     
     def process_image(self):
         """Process the image to detect cars and extract information"""
-        if not self.original_image or not self.image_path:
+        if self.original_image is None or not self.image_path:
             messagebox.showwarning("Warning", "Please select an image first.")
             return
         
@@ -231,29 +227,25 @@ class CarAnalysisApp(ctk.CTk):
     def _run_detection(self):
         """Run the car detection and analysis in a separate thread"""
         try:
-            
-            open_cv_image = cv2.cvtColor(np.array(self.original_image), cv2.COLOR_RGB2BGR)
-            
-            
             self.after(100, lambda: self.progress_bar.set(0.2))
             self.after(100, lambda: self.status_bar.configure(text="Detecting cars..."))
-            
-            
-            
-            detected_cars, car_colors = self.simulate_car_detection(open_cv_image)
-            
-            
-            self.after(100, lambda: self.progress_bar.set(0.6))
-            self.after(100, lambda: self.status_bar.configure(text="Extracting license plates..."))
-            
-            
-            plate_texts = []
-            for car_img in detected_cars:
-                
-                plate_text = self.simulate_license_plate_extraction(car_img)
-                plate_texts.append(plate_text)
-            
-            
+
+            result_img, detected_cars, car_info = backend_process_image(self.image_path)
+
+            if result_img is None:
+                self.after(100, lambda: self.update_with_detection_results([], [], []))
+                self.after(100, lambda: self.status_bar.configure(text="No cars detected or processing failed."))
+                self.after(100, lambda: self.progress_bar.set(0))
+                return
+
+            self.after(100, lambda: self.progress_bar.set(0.8))
+
+            car_colors = [info.get("color", "unknown") for info in car_info]
+            plate_texts = [info.get("text", "No text detected") for info in car_info]
+
+            # Show the annotated source image with detections.
+            annotated_pil = Image.fromarray(cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB))
+            self.after(100, lambda: self.display_image_on_canvas(annotated_pil, self.original_image_canvas))
             self.after(100, lambda: self.update_with_detection_results(detected_cars, car_colors, plate_texts))
             
         except Exception as e:
@@ -365,73 +357,6 @@ class CarAnalysisApp(ctk.CTk):
         self.car_image_canvas.delete("all")
     
     
-    def simulate_car_detection(self, image) -> Tuple[List[np.ndarray], List[str]]:
-        """Simulate car detection - replace with your actual ML model function"""
-        
-        
-        
-        
-        height, width = image.shape[:2]
-        num_cars = np.random.randint(2, 4)
-        
-        detected_cars = []
-        car_colors = []
-        
-        colors = ["Red", "Blue", "Black", "White", "Silver", "Gray"]
-        
-        for i in range(num_cars):
-            
-            crop_h = np.random.randint(height // 4, height // 2)
-            crop_w = np.random.randint(width // 4, width // 2)
-            
-            x = np.random.randint(0, width - crop_w)
-            y = np.random.randint(0, height - crop_h)
-            
-            car_crop = image[y:y+crop_h, x:x+crop_w].copy()
-            
-            
-            cv2.rectangle(car_crop, (5, 5), (crop_w-5, crop_h-5), (0, 255, 0), 2)
-            
-            detected_cars.append(car_crop)
-            car_colors.append(np.random.choice(colors))
-        
-        
-        import time
-        time.sleep(1)
-        
-        return detected_cars, car_colors
-    
-    def simulate_license_plate_extraction(self, car_image) -> str:
-        """Simulate license plate text extraction - replace with your actual OCR function"""
-        
-        
-        
-        
-        letters = "ABCDEFGHJKLMNPQRSTUVWXYZ"
-        numbers = "0123456789"
-        
-        plate_format = np.random.choice([
-            "LL-NNN-LL",  
-            "LL-NN-NNN",  
-            "NNN-LL-NN"   
-        ])
-        
-        plate_text = ""
-        for char in plate_format:
-            if char == "L":
-                plate_text += np.random.choice(list(letters))
-            elif char == "N":
-                plate_text += np.random.choice(list(numbers))
-            else:
-                plate_text += char
-        
-        
-        import time
-        time.sleep(0.5)
-        
-        return plate_text
-
-
 if __name__ == "__main__":
     app = CarAnalysisApp()
     app.mainloop()
